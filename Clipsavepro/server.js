@@ -22,17 +22,12 @@ app.get('/api/download', async (req, res) => {
     }
 
     try {
-        // Using a 100% working, stable, and fast multi-platform download API
-        const apiUrl = 'https://api.acy.dev/api/dl?url=' + encodeURIComponent(videoUrl);
+        // NEW STABLE & ACTIVE MULTI-DOWNLOADER API
+        const apiUrl = 'https://api.vkrhost.erias.io/api/download?url=' + encodeURIComponent(videoUrl);
         
-        console.log('Fetching from new stable API:', apiUrl);
-        const apiResponse = await axios.get(apiUrl, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            }
-        });
+        console.log('Fetching from new active API:', apiUrl);
+        const apiResponse = await axios.get(apiUrl);
         
-        // Forwarding the clean working data to front-end
         if (apiResponse.data) {
             return res.json(apiResponse.data);
         } else {
@@ -43,7 +38,7 @@ app.get('/api/download', async (req, res) => {
         console.error('API Error details:', error.message);
         return res.status(200).json({ 
             success: false, 
-            message: 'This video link is currently private or unsupported. Please try another link.' 
+            message: 'Unable to fetch video data. Please ensure the link is public and try again.' 
         });
     }
 });
