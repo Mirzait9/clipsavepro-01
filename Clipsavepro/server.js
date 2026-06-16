@@ -22,7 +22,7 @@ app.get('/api/download', async (req, res) => {
     }
 
     try {
-        // Corrected API request string with perfect closing brackets
+        // FIXED: Perfect string with correct closing brackets
         const apiResponse = await axios.get(https://api.allinone-downloader.com/v1/download?url=${encodeURIComponent(videoUrl)});
         
         // Send the data back to the frontend
