@@ -5,7 +5,7 @@ function initClipSavePro() {
     const resultDiv = document.getElementById('result');
     const errorDiv = document.getElementById('error');
 
-    // 1. Tab Selection Feature
+    // Tab Navigation
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('tab-btn')) {
             e.preventDefault();
@@ -17,7 +17,7 @@ function initClipSavePro() {
         }
     });
 
-    // 2. Core Download Action
+    // Download Action
     if (downloadBtn && urlInput) {
         const handleDownload = async function(e) {
             if (e) e.preventDefault();
@@ -43,34 +43,18 @@ function initClipSavePro() {
                 const data = await response.json();
 
                 loader.style.display = 'none';
-                console.log("Active API Data:", data);
 
-                let downloadLink = "";
-                
-                // Smart parsing for the new API response structure
-                if (data && data.data) {
-                    if (data.data.url) {
-                        downloadLink = data.data.url;
-                    } else if (data.data.downloads && data.data.downloads.length > 0) {
-                        downloadLink = data.data.downloads[0].url;
-                    } else if (data.data.medias && data.data.medias.length > 0) {
-                        downloadLink = data.data.medias[0].url;
-                    }
-                } else if (data && data.url) {
-                    downloadLink = data.url;
-                }
-
-                if (downloadLink) {
-                    resultDiv.innerHTML = '<p style="margin-bottom: 12px; font-weight: bold; color: #28a745; font-size: 1.1rem;">Video Ready to Download!</p><a href="' + downloadLink + '" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #28a745; color: white; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: bold;">Click Here to Save Video</a>';
+                if (data && data.success && data.url) {
+                    resultDiv.innerHTML = '<p style="margin-bottom: 12px; font-weight: bold; color: #28a745; font-size: 1.1rem;">Video Ready to Download!</p><a href="' + data.url + '" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #28a745; color: white; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: bold;">Click Here to Save Video</a>';
                     resultDiv.style.display = 'block';
                 } else {
-                    errorDiv.innerText = 'Video not found or structure mismatch. Please try another public link.';
+                    errorDiv.innerText = data.message || 'Unsupported video link or private content. Please try another link.';
                     errorDiv.style.display = 'block';
                 }
             } catch (error) {
-                console.error("Frontend handling error:", error);
+                console.error(error);
                 loader.style.display = 'none';
-                errorDiv.innerText = 'Server processing error. Please try again.';
+                errorDiv.innerText = 'System processing error. Please try again.';
                 errorDiv.style.display = 'block';
             } finally {
                 loader.style.display = 'none';
