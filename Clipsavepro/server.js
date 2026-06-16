@@ -18,7 +18,7 @@ app.post('/api/download', async (req, res) => {
     }
 
     try {
-        // Fetching data from a free, powerful all-in-one downloader API
+        // Fetching data from a free downloader API
         const apiResponse = await axios.get(https://api.allinone-downloader.com/v1/download?url=${encodeURIComponent(videoUrl)});
         
         if (apiResponse.data && apiResponse.data.links) {
