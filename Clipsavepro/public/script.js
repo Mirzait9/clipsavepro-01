@@ -17,33 +17,6 @@ function initClipSavePro() {
         }
     });
 
-    // Helper function to find any URL recursively in the API response
-    function findDownloadUrl(obj) {
-        if (!obj || typeof obj !== 'object') return null;
-        
-        // Priority direct matching keys from various video APIs
-        const primaryKeys = ['url', 'download', 'link', 'downloadUrl', 'videoUrl', 'src'];
-        for (let key of primaryKeys) {
-            if (obj[key] && typeof obj[key] === 'string' && obj[key].startsWith('http')) {
-                return obj[key];
-            }
-        }
-
-        // Loop through all properties to find nested objects or arrays
-        for (let key in obj) {
-            if (typeof obj[key] === 'object') {
-                const found = findDownloadUrl(obj[key]);
-                if (found) return found;
-            } else if (typeof obj[key] === 'string' && obj[key].startsWith('http')) {
-                // Ignore tracking, website, or thumb links if possible, but keep as fallback
-                if (!key.toLowerCase().includes('thumb') && !key.toLowerCase().includes('avatar') && !key.toLowerCase().includes('author')) {
-                    return obj[key];
-                }
-            }
-        }
-        return null;
-    }
-
     // 2. Core Download Action
     if (downloadBtn && urlInput) {
         const handleDownload = async function(e) {
@@ -67,19 +40,32 @@ function initClipSavePro() {
             try {
                 const targetUrl = '/api/download?url=' + encodeURIComponent(videoUrl);
                 const response = await fetch(targetUrl);
-                
-                // Safe JSON compilation to avoid "undefined" SyntaxError
                 const data = await response.json();
-                console.log("Response Data Content:", data);
 
-                // Run the automatic link scanner
-                const downloadLink = findDownloadUrl(data);
+                loader.style.display = 'none';
+                console.log("New API Raw Data:", data);
+
+                // Parsing the direct standard output from the new provider
+                let downloadLink = "";
+                
+                if (data && data.success && data.data) {
+                    // For single video links (TikTok, Instagram, Facebook)
+                    if (typeof data.data === 'string') {
+                        downloadLink = data.data;
+                    } else if (data.data.video || data.data.url) {
+                        downloadLink = data.data.video || data.data.url;
+                    } else if (data.data.medias && data.data.medias.length > 0) {
+                        downloadLink = data.data.medias[0].url;
+                    }
+                } else if (data && data.url) {
+                    downloadLink = data.url;
+                }
 
                 if (downloadLink) {
                     resultDiv.innerHTML = '<p style="margin-bottom: 12px; font-weight: bold; color: #28a745; font-size: 1.1rem;">Video Ready to Download!</p><a href="' + downloadLink + '" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #28a745; color: white; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: bold;">Click Here to Save Video</a>';
                     resultDiv.style.display = 'block';
                 } else {
-                    errorDiv.innerText = 'Unsupported video structure or link expired. Please try another link.';
+                    errorDiv.innerText = data.message || 'Invalid link or video not found. Please try another public link.';
                     errorDiv.style.display = 'block';
                 }
             } catch (error) {
@@ -87,7 +73,7 @@ function initClipSavePro() {
                 loader.style.display = 'none';
                 errorDiv.innerText = 'Server processing error. Please try again.';
                 errorDiv.style.display = 'block';
-            } finally {
+            } constructor {
                 loader.style.display = 'none';
                 downloadBtn.disabled = false;
                 downloadBtn.innerText = 'Download Video';
