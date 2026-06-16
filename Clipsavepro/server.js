@@ -1,63 +1,46 @@
 const express = require('express');
-const cors = require('cors');
-const ytdl = require('ytdl-core');
 const path = require('path');
+const axios = require('axios');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
-app.use(cors());
+// Serve frontend static files from public folder
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
-app.use(express.static('public'));
 
-app.get('/', (req, res) => {
+// Main API Route for downloading videos
+app.post('/api/download', async (req, res) => {
+    const { videoUrl } = req.body;
+
+    if (!videoUrl) {
+        return res.status(400).json({ success: false, message: 'URL is required' });
+    }
+
+    try {
+        // Fetching data from a free, powerful all-in-one downloader API
+        const apiResponse = await axios.get(https://api.allinone-downloader.com/v1/download?url=${encodeURIComponent(videoUrl)});
+        
+        if (apiResponse.data && apiResponse.data.links) {
+            return res.json({
+                success: true,
+                title: apiResponse.data.title || 'Video',
+                links: apiResponse.data.links
+            });
+        } else {
+            return res.status(404).json({ success: false, message: 'Video not found or invalid link' });
+        }
+    } catch (error) {
+        console.error('Download Error:', error.message);
+        return res.status(500).json({ success: false, message: 'Server error or video not accessible' });
+    }
+});
+
+// Redirect any other route to index.html
+app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.post('/api/download', async (req, res) => {
-    const { url, platform } = req.body;
-    
-    if (!url) {
-        return res.json({ success: false, error: 'Please enter a valid URL' });
-    }
-    
-    try {
-        let detectedPlatform = platform;
-        
-        if (url.includes('youtube.com') || url.includes('youtu.be')) {
-            detectedPlatform = 'youtube';
-        } else if (url.includes('facebook.com') || url.includes('fb.watch')) {
-            detectedPlatform = 'facebook';
-        } else if (url.includes('instagram.com')) {
-            detectedPlatform = 'instagram';
-        } else if (url.includes('tiktok.com')) {
-            detectedPlatform = 'tiktok';
-        } else if (url.includes('twitter.com') || url.includes('x.com')) {
-            detectedPlatform = 'twitter';
-        }
-        
-        if (detectedPlatform === 'youtube') {
-            const info = await ytdl.getInfo(url);
-            const format = ytdl.chooseFormat(info.formats, { quality: 'highest', filter: 'audioandvideo' });
-            
-            res.json({
-                success: true,
-                downloadUrl: format.url,
-                title: info.videoDetails.title,
-                thumbnail: info.videoDetails.thumbnails[info.videoDetails.thumbnails.length - 1].url,
-                platform: 'YouTube'
-            });
-        } else {
-            res.json({
-                success: false,
-                error: `${detectedPlatform || 'This'} platform download will be available soon. Stay tuned!`
-            });
-        }
-    } catch (error) {
-        res.json({ success: false, error: 'Invalid URL or video not accessible' });
-    }
-});
-
 app.listen(PORT, () => {
-    console.log(`ClipSavePro running on port ${PORT}`);
+    console.log(Server is running on port ${PORT});
 });
