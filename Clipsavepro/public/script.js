@@ -43,15 +43,16 @@ function initClipSavePro() {
                 const data = await response.json();
 
                 loader.style.display = 'none';
-                console.log("New API Raw Data:", data);
+                console.log("Active API Data:", data);
 
                 let downloadLink = "";
                 
-                if (data && data.success && data.data) {
-                    if (typeof data.data === 'string') {
-                        downloadLink = data.data;
-                    } else if (data.data.video || data.data.url) {
-                        downloadLink = data.data.video || data.data.url;
+                // Smart parsing for the new API response structure
+                if (data && data.data) {
+                    if (data.data.url) {
+                        downloadLink = data.data.url;
+                    } else if (data.data.downloads && data.data.downloads.length > 0) {
+                        downloadLink = data.data.downloads[0].url;
                     } else if (data.data.medias && data.data.medias.length > 0) {
                         downloadLink = data.data.medias[0].url;
                     }
@@ -63,7 +64,7 @@ function initClipSavePro() {
                     resultDiv.innerHTML = '<p style="margin-bottom: 12px; font-weight: bold; color: #28a745; font-size: 1.1rem;">Video Ready to Download!</p><a href="' + downloadLink + '" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #28a745; color: white; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: bold;">Click Here to Save Video</a>';
                     resultDiv.style.display = 'block';
                 } else {
-                    errorDiv.innerText = data.message || 'Invalid link or video not found. Please try another public link.';
+                    errorDiv.innerText = 'Video not found or structure mismatch. Please try another public link.';
                     errorDiv.style.display = 'block';
                 }
             } catch (error) {
@@ -72,7 +73,6 @@ function initClipSavePro() {
                 errorDiv.innerText = 'Server processing error. Please try again.';
                 errorDiv.style.display = 'block';
             } finally {
-                // FIXED: Corrected 'constructor' to 'finally' to prevent crashes
                 loader.style.display = 'none';
                 downloadBtn.disabled = false;
                 downloadBtn.innerText = 'Download Video';
