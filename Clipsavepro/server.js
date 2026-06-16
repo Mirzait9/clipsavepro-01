@@ -1,38 +1,46 @@
 const express = require('express');
-const axios = require('axios');
 const cors = require('cors');
+const axios = require('axios');
 const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from public folder
+// Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// API Route for video downloading
+// API Endpoint for Video Download
 app.get('/api/download', async (req, res) => {
     const videoUrl = req.query.url;
+
     if (!videoUrl) {
-        return res.status(400).json({ error: 'URL is required' });
+        return res.status(400).json({ error: 'URL parameter is required' });
     }
+
     try {
-        const targetUrl = 'https://api.allinone-downloader.com/v1/download?url=' + encodeURIComponent(videoUrl);
-        const apiResponse = await axios.get(targetUrl);
+        // FIXED: Standard string concatenation to prevent SyntaxError
+        const apiUrl = 'https://api.allinone-downloader.com/v1/download?url=' + encodeURIComponent(videoUrl);
+        
+        const apiResponse = await axios.get(apiUrl);
+        
+        // Return the third-party API response data directly to your frontend
         res.json(apiResponse.data);
     } catch (error) {
-        console.error(error.message);
-        res.status(500).json({ error: 'API Error' });
+        console.error('API Error:', error.message);
+        res.status(500).json({ error: 'Failed to fetch video data from backend API' });
     }
 });
 
-// Serve index.html for all other routes
+// Fallback to serve index.html for any other requests
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Start Server
 app.listen(PORT, () => {
-    console.log('Server is running perfectly.');
+    console.log(Server is running perfectly on port ${PORT});
 });
