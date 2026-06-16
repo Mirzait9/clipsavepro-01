@@ -1,27 +1,21 @@
-// Ensuring everything runs safely after the DOM is fully loaded
-window.addEventListener('load', () => {
+// Function to initialize all button actions perfectly
+function initClipSavePro() {
     const downloadBtn = document.getElementById('downloadBtn'); 
     const urlInput = document.getElementById('urlInput'); 
     const loader = document.getElementById('loader');
     const resultDiv = document.getElementById('result');
     const errorDiv = document.getElementById('error');
 
-    // 1. Super Solid Tab Selection Feature (Directly targeting button tags)
-    const platformTabs = document.querySelectorAll('.platform-tabs button');
-    
-    if (platformTabs && platformTabs.length > 0) {
-        platformTabs.forEach(tab => {
-            // Using standard click with high priority
-            tab.onclick = function(e) {
-                e.preventDefault();
-                // Remove active class from all peer buttons
-                platformTabs.forEach(t => t.classList.remove('active'));
-                // Add active class to this clicked button
-                this.classList.add('active');
-                console.log("Active Platform:", this.getAttribute('data-platform'));
-            };
-        });
-    }
+    // 1. Tab Selection Feature (Directly using event delegation for safety)
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('tab-btn')) {
+            e.preventDefault();
+            const platformTabs = document.querySelectorAll('.tab-btn');
+            platformTabs.forEach(t => t.classList.remove('active'));
+            e.target.classList.add('active');
+            console.log("Selected Platform ID:", e.target.getAttribute('data-platform'));
+        }
+    });
 
     // 2. Core Download Action
     if (downloadBtn && urlInput) {
@@ -29,7 +23,6 @@ window.addEventListener('load', () => {
             if (e) e.preventDefault();
             const videoUrl = urlInput.value.trim();
             
-            // Reset fields
             resultDiv.style.display = 'none';
             errorDiv.style.display = 'none';
             resultDiv.innerHTML = '';
@@ -40,13 +33,11 @@ window.addEventListener('load', () => {
                 return;
             }
 
-            // Show loading
             loader.style.display = 'block';
             downloadBtn.disabled = true;
             downloadBtn.innerText = 'Processing...';
 
             try {
-                // Calling your working Node backend
                 const response = await fetch(/api/download?url=${encodeURIComponent(videoUrl)});
                 const data = await response.json();
 
@@ -57,7 +48,7 @@ window.addEventListener('load', () => {
                     
                     resultDiv.innerHTML = `
                         <p style="margin-bottom: 12px; font-weight: bold; color: #28a745; font-size: 1.1rem;">Video Ready to Download!</p>
-                        <a href="${downloadLink}" target="_blank" rel="noopener noreferrer">Click Here to Save Video</a>
+                        <a href="${downloadLink}" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #28a745; color: white; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: bold;">Click Here to Save Video</a>
                     `;
                     resultDiv.style.display = 'block';
                 } else {
@@ -67,7 +58,7 @@ window.addEventListener('load', () => {
             } catch (error) {
                 console.error(error);
                 loader.style.display = 'none';
-                errorDiv.innerText = 'Server error or timeout. Please try again.';
+                errorDiv.innerText = 'Server error. Please try again later.';
                 errorDiv.style.display = 'block';
             } finally {
                 downloadBtn.disabled = false;
@@ -75,7 +66,6 @@ window.addEventListener('load', () => {
             }
         };
 
-        // Attach direct actions to main download button
         downloadBtn.onclick = handleDownload;
         
         urlInput.onkeypress = function(e) {
@@ -84,4 +74,9 @@ window.addEventListener('load', () => {
             }
         };
     }
-});
+}
+
+// Fail-safe execution: Trigger immediately and also on loads
+initClipSavePro();
+document.addEventListener('DOMContentLoaded', initClipSavePro);
+window.onload = initClipSavePro;
