@@ -45,11 +45,9 @@ function initClipSavePro() {
                 loader.style.display = 'none';
                 console.log("New API Raw Data:", data);
 
-                // Parsing the direct standard output from the new provider
                 let downloadLink = "";
                 
                 if (data && data.success && data.data) {
-                    // For single video links (TikTok, Instagram, Facebook)
                     if (typeof data.data === 'string') {
                         downloadLink = data.data;
                     } else if (data.data.video || data.data.url) {
@@ -73,7 +71,8 @@ function initClipSavePro() {
                 loader.style.display = 'none';
                 errorDiv.innerText = 'Server processing error. Please try again.';
                 errorDiv.style.display = 'block';
-            } constructor {
+            } finally {
+                // FIXED: Corrected 'constructor' to 'finally' to prevent crashes
                 loader.style.display = 'none';
                 downloadBtn.disabled = false;
                 downloadBtn.innerText = 'Download Video';
