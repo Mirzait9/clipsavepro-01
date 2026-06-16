@@ -18,7 +18,7 @@ body {
     position: fixed;
     width: 100%;
     top: 0;
-    z-index: 1000;
+    z-index: 99; /* Lowered slightly to prevent button blocking */
 }
 
 .nav-container {
@@ -61,7 +61,7 @@ body {
 /* Hero Section */
 .hero {
     text-align: center;
-    padding: 120px 20px 60px;
+    padding: 140px 20px 60px; /* Increased top padding to avoid navbar overlap */
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
 }
 
@@ -93,15 +93,19 @@ body {
     color: #ccc;
 }
 
-/* Downloader Section */
+/* Downloader Section - FIXED Z-INDEX & INTERACTION CLICK LOCK */
 .downloader-section {
-    padding: 60px 20px;
+    padding: 40px 20px;
     background: #0a0a0a;
+    position: relative;
+    z-index: 500; /* High z-index ensures elements inside are clickable */
 }
 
 .container {
     max-width: 800px;
     margin: 0 auto;
+    position: relative;
+    z-index: 510;
 }
 
 .downloader-card {
@@ -109,6 +113,8 @@ body {
     border: 1px solid #333;
     border-radius: 20px;
     padding: 40px;
+    position: relative;
+    z-index: 520;
 }
 
 .platform-tabs {
@@ -117,6 +123,8 @@ body {
     margin-bottom: 2rem;
     flex-wrap: wrap;
     justify-content: center;
+    position: relative;
+    z-index: 530;
 }
 
 .tab-btn {
@@ -127,6 +135,8 @@ body {
     border-radius: 50px;
     cursor: pointer;
     transition: all 0.3s;
+    position: relative;
+    z-index: 540;
 }
 
 .tab-btn:hover {
@@ -144,6 +154,8 @@ body {
     display: flex;
     gap: 1rem;
     margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 530;
 }
 
 .input-wrapper input {
@@ -154,6 +166,8 @@ body {
     border-radius: 10px;
     font-size: 1rem;
     color: white;
+    position: relative;
+    z-index: 540;
 }
 
 .input-wrapper input:focus {
@@ -175,6 +189,8 @@ body {
     font-weight: bold;
     cursor: pointer;
     transition: all 0.3s;
+    position: relative;
+    z-index: 540;
 }
 
 .input-wrapper button:hover {
@@ -248,47 +264,38 @@ body {
     color: #ff6666;
 }
 
-/* Ad Spaces */
+/* ==========================================================================
+   SMART AD SPACE MAGIC - HIDES EMPTY PLACEHOLDERS AUTOMATICALLY
+   ========================================================================== */
 .ad-container {
-    margin: 20px auto;
+    margin: 0px auto;
     text-align: center;
 }
 
-.ad-label {
-    font-size: 0.7rem;
-    color: #555;
-    margin-bottom: 5px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+/* Automatically collapses empty ad blocks and removes ugly text boxes */
+.ad-placeholder, .ad-label {
+    display: none !important;
 }
 
 .ad-space {
-    background: #0d0d0d;
-    border: 1px dashed #333;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 90px;
+    background: transparent;
+    border: none;
+    display: block;
+    min-height: 0px; /* Set to 0 so it disappears when empty */
 }
 
-.ad-placeholder {
-    color: #444;
-    font-size: 0.8rem;
-}
-
-.top-ad .ad-space {
-    min-height: 90px;
+.top-ad .ad-space, .footer-ad .ad-space {
+    min-height: 0px;
     max-width: 728px;
     margin: 0 auto;
 }
 
 .native-ad {
-    margin: 20px 0;
+    margin: 0px;
 }
 
 .native-ad .ad-space {
-    min-height: 120px;
+    min-height: 0px;
 }
 
 .sidebar-ad {
@@ -297,19 +304,18 @@ body {
     top: 50%;
     transform: translateY(-50%);
     width: 300px;
-    z-index: 100;
+    z-index: 10; /* Lowered so it doesn't cover main downloader content */
+    display: none; /* Hidden until valid ad code script runs inside it */
 }
 
 .sidebar-ad .ad-space {
-    min-height: 250px;
-    background: #0d0d0d;
+    min-height: 0px;
+    background: transparent;
 }
 
-.footer-ad .ad-space {
-    min-height: 90px;
-    max-width: 728px;
-    margin: 0 auto;
-}
+/* ==========================================================================
+   End of Ad Magic
+   ========================================================================== */
 
 /* Features */
 .features {
@@ -528,7 +534,7 @@ footer {
 /* Responsive */
 @media (max-width: 1200px) {
     .sidebar-ad {
-        display: none;
+        display: none !important;
     }
 }
 
