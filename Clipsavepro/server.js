@@ -22,12 +22,11 @@ app.get('/api/download', async (req, res) => {
     }
 
     try {
-        // FIXED: Standard string concatenation to prevent SyntaxError
-        const apiUrl = 'https://api.allinone-downloader.com/v1/download?url=' + encodeURIComponent(videoUrl);
+        // Safe and clean API URL formulation
+        const baseApi = 'https://api.allinone-downloader.com/v1/download';
+        const finalUrl = baseApi + '?url=' + encodeURIComponent(videoUrl);
         
-        const apiResponse = await axios.get(apiUrl);
-        
-        // Return the third-party API response data directly to your frontend
+        const apiResponse = await axios.get(finalUrl);
         res.json(apiResponse.data);
     } catch (error) {
         console.error('API Error:', error.message);
@@ -42,5 +41,5 @@ app.get('*', (req, res) => {
 
 // Start Server
 app.listen(PORT, () => {
-    console.log(Server is running perfectly on port ${PORT});
+    console.log('Server is running perfectly on port ' + PORT);
 });
