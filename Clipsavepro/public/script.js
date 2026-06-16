@@ -13,7 +13,7 @@ function initClipSavePro() {
             const platformTabs = document.querySelectorAll('.tab-btn');
             platformTabs.forEach(t => t.classList.remove('active'));
             e.target.classList.add('active');
-            console.log("Selected Platform ID:", e.target.getAttribute('data-platform'));
+            console.log("Selected Platform:", e.target.getAttribute('data-platform'));
         }
     });
 
@@ -38,7 +38,9 @@ function initClipSavePro() {
             downloadBtn.innerText = 'Processing...';
 
             try {
-                const response = await fetch(/api/download?url=${encodeURIComponent(videoUrl)});
+                // FIXED: Using standard string concatenation to completely avoid SyntaxError
+                const apiUrl = '/api/download?url=' + encodeURIComponent(videoUrl);
+                const response = await fetch(apiUrl);
                 const data = await response.json();
 
                 loader.style.display = 'none';
