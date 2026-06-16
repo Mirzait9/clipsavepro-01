@@ -14,7 +14,6 @@ function initClipSavePro() {
                 t.classList.remove('active');
             });
             e.target.classList.add('active');
-            console.log("Selected Platform");
         }
     });
 
@@ -44,14 +43,23 @@ function initClipSavePro() {
                 const data = await response.json();
 
                 loader.style.display = 'none';
+                console.log("Response Data Received:", data);
 
+                // Dynamically parsing links or secondary fields directly from the provider
+                let downloadLink = "";
                 if (data && data.links && data.links.length > 0) {
-                    const downloadLink = data.links[0].url;
-                    
+                    downloadLink = data.links[0].url;
+                } else if (data && data.url) {
+                    downloadLink = data.url;
+                } else if (data && data.urls && data.urls.length > 0) {
+                    downloadLink = data.urls[0];
+                }
+
+                if (downloadLink) {
                     resultDiv.innerHTML = '<p style="margin-bottom: 12px; font-weight: bold; color: #28a745; font-size: 1.1rem;">Video Ready to Download!</p><a href="' + downloadLink + '" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #28a745; color: white; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: bold;">Click Here to Save Video</a>';
                     resultDiv.style.display = 'block';
                 } else {
-                    errorDiv.innerText = 'Invalid link or video not found. Please try another link.';
+                    errorDiv.innerText = data.message || 'Invalid link or video not supported. Please try another link.';
                     errorDiv.style.display = 'block';
                 }
             } catch (error) {
@@ -75,7 +83,6 @@ function initClipSavePro() {
     }
 }
 
-// Fail-safe execution
 initClipSavePro();
 document.addEventListener('DOMContentLoaded', initClipSavePro);
 window.onload = initClipSavePro;
