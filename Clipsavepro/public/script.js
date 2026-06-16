@@ -1,20 +1,25 @@
-document.addEventListener('DOMContentLoaded', () => {
+// Ensuring everything runs safely after the DOM is fully loaded
+window.addEventListener('load', () => {
     const downloadBtn = document.getElementById('downloadBtn'); 
     const urlInput = document.getElementById('urlInput'); 
-    const platformTabs = document.querySelectorAll('.tab-btn');
     const loader = document.getElementById('loader');
     const resultDiv = document.getElementById('result');
     const errorDiv = document.getElementById('error');
 
-    // 1. Tab Selection Feature
-    if (platformTabs.length > 0) {
+    // 1. Super Solid Tab Selection Feature (Directly targeting button tags)
+    const platformTabs = document.querySelectorAll('.platform-tabs button');
+    
+    if (platformTabs && platformTabs.length > 0) {
         platformTabs.forEach(tab => {
-            tab.addEventListener('click', (e) => {
+            // Using standard click with high priority
+            tab.onclick = function(e) {
                 e.preventDefault();
+                // Remove active class from all peer buttons
                 platformTabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                console.log("Selected platform: ", tab.innerText);
-            });
+                // Add active class to this clicked button
+                this.classList.add('active');
+                console.log("Active Platform:", this.getAttribute('data-platform'));
+            };
         });
     }
 
@@ -24,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e) e.preventDefault();
             const videoUrl = urlInput.value.trim();
             
+            // Reset fields
             resultDiv.style.display = 'none';
             errorDiv.style.display = 'none';
             resultDiv.innerHTML = '';
@@ -34,11 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // Show loading
             loader.style.display = 'block';
             downloadBtn.disabled = true;
             downloadBtn.innerText = 'Processing...';
 
             try {
+                // Calling your working Node backend
                 const response = await fetch(/api/download?url=${encodeURIComponent(videoUrl)});
                 const data = await response.json();
 
@@ -59,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error(error);
                 loader.style.display = 'none';
-                errorDiv.innerText = 'Server error. Please try again later.';
+                errorDiv.innerText = 'Server error or timeout. Please try again.';
                 errorDiv.style.display = 'block';
             } finally {
                 downloadBtn.disabled = false;
@@ -67,12 +75,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        downloadBtn.addEventListener('click', handleDownload);
+        // Attach direct actions to main download button
+        downloadBtn.onclick = handleDownload;
         
-        urlInput.addEventListener('keypress', (e) => {
+        urlInput.onkeypress = function(e) {
             if (e.key === 'Enter') {
                 handleDownload(e);
             }
-        });
+        };
     }
 });
