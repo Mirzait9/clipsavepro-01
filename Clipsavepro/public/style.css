@@ -18,7 +18,8 @@ body {
     position: fixed;
     width: 100%;
     top: 0;
-    z-index: 99; /* Lowered slightly to prevent button blocking */
+    left: 0;
+    z-index: 999; /* Proper header layer */
 }
 
 .nav-container {
@@ -58,10 +59,10 @@ body {
     color: white;
 }
 
-/* Hero Section */
+/* Hero Section - ADDED EXTRA TOP PADDING TO PREVENT OVERLAP */
 .hero {
     text-align: center;
-    padding: 140px 20px 60px; /* Increased top padding to avoid navbar overlap */
+    padding: 160px 20px 60px; /* 160px keeps main content safely away from fixed navbar */
     background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
 }
 
@@ -93,19 +94,17 @@ body {
     color: #ccc;
 }
 
-/* Downloader Section - FIXED Z-INDEX & INTERACTION CLICK LOCK */
+/* Downloader Section - FIXED INTERACTION LOCK */
 .downloader-section {
     padding: 40px 20px;
     background: #0a0a0a;
     position: relative;
-    z-index: 500; /* High z-index ensures elements inside are clickable */
+    z-index: 10; /* Lower than navbar but highly interactive */
 }
 
 .container {
     max-width: 800px;
     margin: 0 auto;
-    position: relative;
-    z-index: 510;
 }
 
 .downloader-card {
@@ -113,8 +112,7 @@ body {
     border: 1px solid #333;
     border-radius: 20px;
     padding: 40px;
-    position: relative;
-    z-index: 520;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .platform-tabs {
@@ -123,8 +121,6 @@ body {
     margin-bottom: 2rem;
     flex-wrap: wrap;
     justify-content: center;
-    position: relative;
-    z-index: 530;
 }
 
 .tab-btn {
@@ -134,14 +130,14 @@ body {
     color: #aaa;
     border-radius: 50px;
     cursor: pointer;
-    transition: all 0.3s;
-    position: relative;
-    z-index: 540;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
 }
 
 .tab-btn:hover {
     border-color: #666;
     color: white;
+    background: #222;
 }
 
 .tab-btn.active {
@@ -154,8 +150,6 @@ body {
     display: flex;
     gap: 1rem;
     margin-bottom: 1.5rem;
-    position: relative;
-    z-index: 530;
 }
 
 .input-wrapper input {
@@ -166,13 +160,11 @@ body {
     border-radius: 10px;
     font-size: 1rem;
     color: white;
-    position: relative;
-    z-index: 540;
 }
 
 .input-wrapper input:focus {
     outline: none;
-    border-color: #666;
+    border-color: #888;
 }
 
 .input-wrapper input::placeholder {
@@ -188,14 +180,17 @@ body {
     font-size: 1rem;
     font-weight: bold;
     cursor: pointer;
-    transition: all 0.3s;
-    position: relative;
-    z-index: 540;
+    transition: all 0.2s;
 }
 
 .input-wrapper button:hover {
     background: #ddd;
-    transform: translateY(-2px);
+}
+
+.input-wrapper button:disabled {
+    background: #444;
+    color: #888;
+    cursor: not-allowed;
 }
 
 /* Loader */
@@ -241,17 +236,18 @@ body {
 
 .result a {
     display: inline-block;
-    background: white;
-    color: black;
+    background: #28a745;
+    color: white;
     text-decoration: none;
     padding: 12px 24px;
     border-radius: 10px;
     font-weight: bold;
     margin-top: 10px;
+    transition: background 0.2s;
 }
 
 .result a:hover {
-    background: #ddd;
+    background: #218838;
 }
 
 .error {
@@ -264,15 +260,12 @@ body {
     color: #ff6666;
 }
 
-/* ==========================================================================
-   SMART AD SPACE MAGIC - HIDES EMPTY PLACEHOLDERS AUTOMATICALLY
-   ========================================================================== */
+/* CLEAN AUTO-COLLAPSED AD SPACES */
 .ad-container {
-    margin: 0px auto;
+    margin: 0 auto;
     text-align: center;
 }
 
-/* Automatically collapses empty ad blocks and removes ugly text boxes */
 .ad-placeholder, .ad-label {
     display: none !important;
 }
@@ -281,110 +274,56 @@ body {
     background: transparent;
     border: none;
     display: block;
-    min-height: 0px; /* Set to 0 so it disappears when empty */
+    min-height: 0px; 
 }
 
-.top-ad .ad-space, .footer-ad .ad-space {
-    min-height: 0px;
-    max-width: 728px;
-    margin: 0 auto;
-}
-
-.native-ad {
-    margin: 0px;
-}
-
-.native-ad .ad-space {
+.top-ad .ad-space, .footer-ad .ad-space, .native-ad .ad-space {
     min-height: 0px;
 }
 
 .sidebar-ad {
-    position: fixed;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 300px;
-    z-index: 10; /* Lowered so it doesn't cover main downloader content */
-    display: none; /* Hidden until valid ad code script runs inside it */
+    display: none !important; /* Fully hidden to avoid taking responsive widths */
 }
 
-.sidebar-ad .ad-space {
-    min-height: 0px;
-    background: transparent;
-}
-
-/* ==========================================================================
-   End of Ad Magic
-   ========================================================================== */
-
-/* Features */
-.features {
+/* Features, How It Works, Supported Sites, FAQ */
+.features, .how-it-works, .supported-sites, .faq {
     padding: 80px 20px;
     background: #0a0a0a;
 }
 
-.features h2 {
+.how-it-works { background: #050505; }
+.faq { background: #050505; }
+
+.features h2, .how-it-works h2, .supported-sites h2, .faq h2 {
     text-align: center;
     font-size: 2.5rem;
     color: white;
     margin-bottom: 3rem;
 }
 
-.features-grid {
+.features-grid, .steps, .faq-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
 }
 
-.feature {
-    text-align: center;
-    padding: 2rem;
+.sites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.feature, .step, .site, .faq-item {
     background: #111111;
     border: 1px solid #333;
+    padding: 2rem;
     border-radius: 15px;
-    transition: transform 0.3s;
 }
 
-.feature:hover {
-    transform: translateY(-5px);
-    border-color: #555;
-}
-
-.feature-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-}
-
-.feature h3 {
-    color: white;
-    margin-bottom: 0.5rem;
-}
-
-.feature p {
-    color: #888;
-}
-
-/* How It Works */
-.how-it-works {
-    padding: 80px 20px;
-    background: #050505;
-}
-
-.how-it-works h2 {
+.site {
     text-align: center;
-    font-size: 2.5rem;
-    color: white;
-    margin-bottom: 3rem;
-}
-
-.steps {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-}
-
-.step {
-    text-align: center;
+    padding: 1rem;
+    border-radius: 10px;
 }
 
 .step-num {
@@ -399,84 +338,6 @@ body {
     font-size: 1.8rem;
     font-weight: bold;
     margin: 0 auto 1rem;
-}
-
-.step h3 {
-    color: white;
-    margin-bottom: 0.5rem;
-}
-
-.step p {
-    color: #888;
-}
-
-/* Supported Sites */
-.supported-sites {
-    padding: 80px 20px;
-    background: #0a0a0a;
-}
-
-.supported-sites h2 {
-    text-align: center;
-    font-size: 2.5rem;
-    color: white;
-    margin-bottom: 3rem;
-}
-
-.sites-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-}
-
-.site {
-    background: #111111;
-    border: 1px solid #333;
-    color: #ccc;
-    padding: 1rem;
-    text-align: center;
-    border-radius: 10px;
-    transition: all 0.3s;
-}
-
-.site:hover {
-    border-color: #666;
-    color: white;
-}
-
-/* FAQ */
-.faq {
-    padding: 80px 20px;
-    background: #050505;
-}
-
-.faq h2 {
-    text-align: center;
-    font-size: 2.5rem;
-    color: white;
-    margin-bottom: 3rem;
-}
-
-.faq-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
-}
-
-.faq-item {
-    background: #111111;
-    border: 1px solid #333;
-    padding: 1.5rem;
-    border-radius: 15px;
-}
-
-.faq-item h3 {
-    color: white;
-    margin-bottom: 0.5rem;
-}
-
-.faq-item p {
-    color: #888;
 }
 
 /* Footer */
@@ -512,7 +373,6 @@ footer {
 .footer-section a {
     color: #aaa;
     text-decoration: none;
-    transition: color 0.3s;
 }
 
 .footer-section a:hover {
@@ -525,37 +385,10 @@ footer {
     border-top: 1px solid #1a1a1a;
 }
 
-.disclaimer {
-    font-size: 0.8rem;
-    opacity: 0.7;
-    margin-top: 0.5rem;
-}
-
 /* Responsive */
-@media (max-width: 1200px) {
-    .sidebar-ad {
-        display: none !important;
-    }
-}
-
 @media (max-width: 768px) {
-    .hero h1 {
-        font-size: 2.5rem;
-    }
-    
-    .input-wrapper {
-        flex-direction: column;
-    }
-    
-    .nav-menu {
-        display: none;
-    }
-    
-    .features-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .faq-grid {
-        grid-template-columns: 1fr;
-    }
+    .hero h1 { font-size: 2.5rem; }
+    .input-wrapper { flex-direction: column; }
+    .nav-menu { display: none; }
+    .features-grid, .faq-grid { grid-template-columns: 1fr; }
 }
