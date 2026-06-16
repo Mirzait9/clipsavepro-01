@@ -5,7 +5,7 @@ function initClipSavePro() {
     const resultDiv = document.getElementById('result');
     const errorDiv = document.getElementById('error');
 
-    // Tab Navigation
+    // Tab Navigation for multiple platforms
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('tab-btn')) {
             e.preventDefault();
@@ -17,7 +17,7 @@ function initClipSavePro() {
         }
     });
 
-    // Download Action
+    // Main Core Download Engine Listener
     if (downloadBtn && urlInput) {
         const handleDownload = async function(e) {
             if (e) e.preventDefault();
@@ -29,13 +29,13 @@ function initClipSavePro() {
             errorDiv.innerHTML = '';
 
             if (!videoUrl) {
-                alert('Please enter a valid video link!');
+                alert('Please enter a valid video link (YouTube, Facebook, Instagram)!');
                 return;
             }
 
             loader.style.display = 'block';
             downloadBtn.disabled = true;
-            downloadBtn.innerText = 'Processing...';
+            downloadBtn.innerText = 'Processing Video...';
 
             try {
                 const targetUrl = '/api/download?url=' + encodeURIComponent(videoUrl);
@@ -45,16 +45,16 @@ function initClipSavePro() {
                 loader.style.display = 'none';
 
                 if (data && data.success && data.url) {
-                    resultDiv.innerHTML = '<p style="margin-bottom: 12px; font-weight: bold; color: #28a745; font-size: 1.1rem;">Video Ready to Download!</p><a href="' + data.url + '" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #28a745; color: white; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: bold;">Click Here to Save Video</a>';
+                    resultDiv.innerHTML = '<p style="margin-bottom: 12px; font-weight: bold; color: #28a745; font-size: 1.1rem;">Video Found Successfully!</p><a href="' + data.url + '" target="_blank" rel="noopener noreferrer" style="display: inline-block; background: #28a745; color: white; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: bold;">Click Here to Save Video</a>';
                     resultDiv.style.display = 'block';
                 } else {
-                    errorDiv.innerText = data.message || 'Unsupported video link or private content. Please try another link.';
+                    errorDiv.innerText = data.message || 'Could not parse this link. Please ensure it is a public video.';
                     errorDiv.style.display = 'block';
                 }
             } catch (error) {
                 console.error(error);
                 loader.style.display = 'none';
-                errorDiv.innerText = 'System processing error. Please try again.';
+                errorDiv.innerText = 'Server processing error. Please try again.';
                 errorDiv.style.display = 'block';
             } finally {
                 loader.style.display = 'none';
