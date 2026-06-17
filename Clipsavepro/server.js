@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Standard Stable YouTube Download Endpoint
+// Premium YouTube Download Endpoint with Identity Headers
 app.get('/api/download', async (req, res) => {
     const videoUrl = req.query.url;
 
@@ -18,7 +18,6 @@ app.get('/api/download', async (req, res) => {
         return res.status(400).json({ error: 'URL parameter is required' });
     }
 
-    // Strict validation to allow ONLY YouTube links
     if (!videoUrl.includes('youtube.com') && !videoUrl.includes('youtu.be')) {
         return res.json({ 
             success: false, 
@@ -27,11 +26,11 @@ app.get('/api/download', async (req, res) => {
     }
 
     try {
-        console.log('Axios Processing YouTube URL:', videoUrl);
+        console.log('Processing Request with Identity Headers:', videoUrl);
         
-        // Using Cobalt premium high-speed open network via clean Axios POST
         const queryTarget = 'https://api.cobalt.tools/api/json';
         
+        // Sending simulated browser headers to bypass server blockings
         const apiResponse = await axios.post(queryTarget, {
             url: videoUrl,
             videoQuality: '720',
@@ -39,9 +38,12 @@ app.get('/api/download', async (req, res) => {
         }, {
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Accept': 'application/json',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+                'Origin': 'https://cobalt.tools',
+                'Referer': 'https://cobalt.tools/'
             },
-            timeout: 12000 // 12 seconds timeout
+            timeout: 15000 // 15 seconds timeout
         });
 
         const data = apiResponse.data;
@@ -53,15 +55,15 @@ app.get('/api/download', async (req, res) => {
         } else {
             return res.json({ 
                 success: false, 
-                message: 'Extraction failed. Please try clicking the button again with a valid video link.' 
+                message: 'Extraction failed. Please try again with a different YouTube link.' 
             });
         }
 
     } catch (error) {
-        console.error('Axios Engine Error:', error.message);
+        console.error('Axios Detailed Error:', error.message);
         return res.status(200).json({ 
             success: false, 
-            message: 'Server stream is busy. Please try another YouTube video link.' 
+            message: 'System is updating data stream. Please click the button again in a moment.' 
         });
     }
 });
@@ -71,5 +73,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log('ClipSavePro Pure Axios Engine Active on port ' + PORT);
+    console.log('ClipSavePro Browser-Identity Engine Active on port ' + PORT);
 });
