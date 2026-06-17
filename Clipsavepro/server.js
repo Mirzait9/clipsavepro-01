@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Dedicated YouTube Video & Shorts Download Endpoint
+// Dedicated YouTube Download Endpoint
 app.get('/api/download', async (req, res) => {
     const videoUrl = req.query.url;
 
@@ -18,7 +18,6 @@ app.get('/api/download', async (req, res) => {
         return res.status(400).json({ error: 'URL parameter is required' });
     }
 
-    // Strict validation to ensure only YouTube links are processed for now
     if (!videoUrl.includes('youtube.com') && !videoUrl.includes('youtu.be')) {
         return res.json({ 
             success: false, 
@@ -27,33 +26,35 @@ app.get('/api/download', async (req, res) => {
     }
 
     try {
-        console.log('Processing Dedicated YouTube URL:', videoUrl);
+        console.log('Processing YouTube URL:', videoUrl);
         
-        // Fast, isolated open-source gateway specifically for YouTube structure
+        // Alternative Stable YouTube API Gateway
         const ytApiUrl = 'https://api.vkrhost.erias.io/api/download?url=' + encodeURIComponent(videoUrl);
-        const apiResponse = await axios.get(ytApiUrl);
+        
+        const apiResponse = await axios.get(ytApiUrl, { timeout: 10000 });
         const data = apiResponse.data;
 
         let downloadLink = "";
 
-        if (data && data.data) {
-            if (data.data.url) {
+        // Flexible parsing logic to extract video url
+        if (data) {
+            if (data.data && data.data.url) {
                 downloadLink = data.data.url;
-            } else if (data.data.downloads && data.data.downloads.length > 0) {
+            } else if (data.data && data.data.downloads && data.data.downloads.length > 0) {
                 downloadLink = data.data.downloads[0].url;
-            } else if (data.data.medias && data.data.medias.length > 0) {
-                downloadLink = data.data.medias[0].url;
+            } else if (data.url) {
+                downloadLink = data.url;
+            } else if (data.links && data.links.length > 0) {
+                downloadLink = data.links[0].url;
             }
-        } else if (data && data.url) {
-            downloadLink = data.url;
         }
 
-        if (downloadLink) {
+        if (downloadLink && downloadLink.startsWith('http')) {
             return res.json({ success: true, url: downloadLink });
         } else {
             return res.json({ 
                 success: false, 
-                message: 'Could not fetch download links for this YouTube video. Make sure it is public.' 
+                message: 'Could not fetch download links. Please ensure the video is public and try another link.' 
             });
         }
 
@@ -61,7 +62,7 @@ app.get('/api/download', async (req, res) => {
         console.error('YouTube Engine Error:', error.message);
         return res.status(200).json({ 
             success: false, 
-            message: 'Server is currently busy. Please click the download button again.' 
+            message: 'Connection timed out. Please click the download button again.' 
         });
     }
 });
@@ -71,5 +72,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log('ClipSavePro YouTube Engine Running Perfectly on port ' + PORT);
+    console.log('ClipSavePro YouTube Engine Active on port ' + PORT);
 });
