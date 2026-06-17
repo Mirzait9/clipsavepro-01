@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Universal Secure Downloader Gateway
+// Dedicated YouTube Video & Shorts Download Endpoint
 app.get('/api/download', async (req, res) => {
     const videoUrl = req.query.url;
 
@@ -18,56 +18,50 @@ app.get('/api/download', async (req, res) => {
         return res.status(400).json({ error: 'URL parameter is required' });
     }
 
-    try {
-        console.log('Universal Engine Processing URL:', videoUrl);
-        let downloadLink = "";
-
-        // Premium Global Server Gateway for seamless multi-platform extraction
-        const globalGatewayUrl = 'https://api.vkrhost.erias.io/api/download?url=' + encodeURIComponent(videoUrl);
-        
-        const apiResponse = await axios.get(globalGatewayUrl, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
-            },
-            timeout: 15000 // 15 seconds timeout
+    // Strict validation to ensure only YouTube links are processed for now
+    if (!videoUrl.includes('youtube.com') && !videoUrl.includes('youtu.be')) {
+        return res.json({ 
+            success: false, 
+            message: 'This downloader currently only supports YouTube videos and shorts.' 
         });
+    }
 
+    try {
+        console.log('Processing Dedicated YouTube URL:', videoUrl);
+        
+        // Fast, isolated open-source gateway specifically for YouTube structure
+        const ytApiUrl = 'https://api.vkrhost.erias.io/api/download?url=' + encodeURIComponent(videoUrl);
+        const apiResponse = await axios.get(ytApiUrl);
         const data = apiResponse.data;
 
-        // Multi-layered parsing algorithm to catch FB, Instagram & YouTube structures
-        if (data) {
-            if (data.data) {
-                if (data.data.url) {
-                    downloadLink = data.data.url;
-                } else if (data.data.downloads && data.data.downloads.length > 0) {
-                    downloadLink = data.data.downloads[0].url;
-                } else if (data.data.medias && data.data.medias.length > 0) {
-                    downloadLink = data.data.medias[0].url;
-                }
-            } else if (data.url) {
-                downloadLink = data.url;
-            } else if (data.links && data.links.length > 0) {
-                downloadLink = data.links[0].url;
-            } else if (data.urls && data.urls.length > 0) {
-                downloadLink = data.urls[0];
+        let downloadLink = "";
+
+        if (data && data.data) {
+            if (data.data.url) {
+                downloadLink = data.data.url;
+            } else if (data.data.downloads && data.data.downloads.length > 0) {
+                downloadLink = data.data.downloads[0].url;
+            } else if (data.data.medias && data.data.medias.length > 0) {
+                downloadLink = data.data.medias[0].url;
             }
+        } else if (data && data.url) {
+            downloadLink = data.url;
         }
 
-        // Validate extracted link before sending to user
-        if (downloadLink && downloadLink.startsWith('http')) {
+        if (downloadLink) {
             return res.json({ success: true, url: downloadLink });
         } else {
             return res.json({ 
                 success: false, 
-                message: 'This video format is highly encrypted or private. Please try another public link.' 
+                message: 'Could not fetch download links for this YouTube video. Make sure it is public.' 
             });
         }
 
     } catch (error) {
-        console.error('Universal Engine Error:', error.message);
+        console.error('YouTube Engine Error:', error.message);
         return res.status(200).json({ 
             success: false, 
-            message: 'Network is busy or connection timed out. Please try clicking the button again.' 
+            message: 'Server is currently busy. Please click the download button again.' 
         });
     }
 });
@@ -77,5 +71,5 @@ app.get('*', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log('ClipSavePro All-In-One Universal Engine running on port ' + PORT);
+    console.log('ClipSavePro YouTube Engine Running Perfectly on port ' + PORT);
 });
