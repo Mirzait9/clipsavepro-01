@@ -1,7 +1,7 @@
 {
   "name": "clipsavepro",
   "version": "1.0.0",
-  "description": "RapidAPI Powered Video Downloader",
+  "description": "RapidAPI Video Downloader",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
